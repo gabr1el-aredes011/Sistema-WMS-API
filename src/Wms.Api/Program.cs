@@ -1,3 +1,5 @@
+using Wms.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,7 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+var connectionString =
+    builder.Configuration.GetConnectionString("WmsDatabase")
+    ?? throw new InvalidOperationException(
+        "A connection string 'WmsDatabase' não foi configurada.");
 
+builder.Services.AddInfrastructure(connectionString);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -19,5 +26,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHealthChecks("/api/v1/health/ready");
 
 app.Run();
