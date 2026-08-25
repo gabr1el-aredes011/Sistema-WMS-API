@@ -1,0 +1,6 @@
+@Wms.Api_HostAddress = http://localhost:5078
+
+GET {{Wms.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
