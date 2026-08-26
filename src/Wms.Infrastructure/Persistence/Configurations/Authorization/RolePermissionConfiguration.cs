@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wms.Infrastructure.Authorization;
+using Wms.Infrastructure.Persistence.Seed;
 
 namespace Wms.Infrastructure.Persistence.Configurations.Authorization;
 
@@ -46,5 +47,13 @@ public sealed class RolePermissionConfiguration
         builder
             .HasIndex(rolePermission => rolePermission.AssignedByUserId)
             .HasDatabaseName("ix_role_permissions_assigned_by_user_id");
+
+        builder.HasData(AuthorizationSeedData.RolePermissions.Select(seed => new
+        {
+            seed.RoleId,
+            seed.PermissionId,
+            AssignedAtUtc = AuthorizationSeedData.SeededAtUtc,
+            AssignedByUserId = (Guid?)null
+        }));
     }
 }

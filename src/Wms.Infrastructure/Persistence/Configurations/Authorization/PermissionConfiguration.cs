@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wms.Infrastructure.Authorization;
+using Wms.Infrastructure.Persistence.Seed;
 
 namespace Wms.Infrastructure.Persistence.Configurations.Authorization;
 
@@ -56,5 +57,18 @@ public sealed class PermissionConfiguration
                 permission.IsActive
             })
             .HasDatabaseName("ix_permissions_module_active");
+
+        builder.HasData(AuthorizationSeedData.Permissions.Select(seed => new
+        {
+            seed.Id,
+            seed.Definition.Code,
+            seed.Definition.Name,
+            seed.Definition.Module,
+            seed.Definition.Description,
+            IsSystem = true,
+            IsActive = true,
+            CreatedAtUtc = AuthorizationSeedData.SeededAtUtc,
+            UpdatedAtUtc = (DateTimeOffset?)null
+        }));
     }
 }

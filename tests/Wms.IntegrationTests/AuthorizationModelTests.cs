@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Wms.Application.Authorization;
 using Wms.Infrastructure.Authorization;
+using Wms.Infrastructure.Identity;
 using Wms.Infrastructure.Persistence;
 
 namespace Wms.IntegrationTests;
@@ -48,5 +52,31 @@ public sealed class AuthorizationModelTests
         Assert.Equal(
             [nameof(RolePermission.RoleId), nameof(RolePermission.PermissionId)],
             primaryKey.Properties.Select(property => property.Name));
+    }
+
+    [Fact]
+    public void AuthorizationCatalog_IsIncludedInTheEfModel()
+    {
+        using var context = CreateContext();
+
+        var designTimeModel = context
+            .GetService<IDesignTimeModel>()
+            .Model;
+
+        var permissionSeed = designTimeModel
+            .FindEntityType(typeof(Permission))!
+            .GetSeedData();
+        var roleSeed = designTimeModel
+            .FindEntityType(typeof(ApplicationRole))!
+            .GetSeedData();
+        var rolePermissionSeed = designTimeModel
+            .FindEntityType(typeof(RolePermission))!
+            .GetSeedData();
+
+        Assert.Equal(SystemPermissions.All.Count, permissionSeed.Count());
+        Assert.Equal(SystemRoles.All.Count, roleSeed.Count());
+        Assert.Equal(
+            SystemRoles.All.Sum(role => role.PermissionCodes.Count),
+            rolePermissionSeed.Count());
     }
 }
