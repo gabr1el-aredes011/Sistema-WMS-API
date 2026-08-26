@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Wms.Infrastructure.Authorization;
+using Wms.Infrastructure.Authentication;
 using Wms.Infrastructure.Identity;
 
 namespace Wms.Infrastructure.Persistence;
@@ -18,6 +19,8 @@ public sealed class WmsDbContext
     public DbSet<Permission> Permissions => Set<Permission>();
 
     public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+
+    public DbSet<RefreshSession> RefreshSessions => Set<RefreshSession>();
 
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)

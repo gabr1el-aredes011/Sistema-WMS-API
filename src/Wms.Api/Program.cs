@@ -1,4 +1,5 @@
 using Wms.Infrastructure;
+using Wms.Infrastructure.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +13,12 @@ var connectionString =
     ?? throw new InvalidOperationException(
         "A connection string 'WmsDatabase' não foi configurada.");
 
-builder.Services.AddInfrastructure(connectionString);
+builder.Services.AddInfrastructure(
+    connectionString,
+    builder.Configuration);
 var app = builder.Build();
+
+await app.Services.SeedDevelopmentAdminAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -23,6 +28,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
@@ -30,3 +36,5 @@ app.MapControllers();
 app.MapHealthChecks("/api/v1/health/ready");
 
 app.Run();
+
+public partial class Program;
