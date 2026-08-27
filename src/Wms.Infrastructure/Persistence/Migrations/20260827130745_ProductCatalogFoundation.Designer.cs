@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Wms.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using Wms.Infrastructure.Persistence;
 namespace Wms.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(WmsDbContext))]
-    partial class WmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260827130745_ProductCatalogFoundation")]
+    partial class ProductCatalogFoundation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,8 +24,6 @@ namespace Wms.Infrastructure.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.HasSequence("product_internal_code_sequence", "catalog");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -148,11 +149,6 @@ namespace Wms.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("ItemType")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("character varying(40)");
-
                     b.Property<int?>("LengthMillimeters")
                         .HasColumnType("integer");
 
@@ -227,6 +223,10 @@ namespace Wms.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Barcode")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasMaxLength(60)
@@ -235,26 +235,21 @@ namespace Wms.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ExternalBarcode")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<string>("ExternalReference")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<string>("InternalCode")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasDefaultValueSql("'PV-' || LPAD(nextval('catalog.product_internal_code_sequence')::text, 8, '0')");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("NormalizedSku")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<string>("UnitOfMeasure")
                         .IsRequired()
@@ -266,17 +261,14 @@ namespace Wms.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExternalBarcode")
+                    b.HasIndex("Barcode")
                         .IsUnique()
-                        .HasDatabaseName("ux_product_variants_external_barcode")
-                        .HasFilter("\"ExternalBarcode\" IS NOT NULL");
+                        .HasDatabaseName("ux_product_variants_barcode")
+                        .HasFilter("\"Barcode\" IS NOT NULL");
 
-                    b.HasIndex("ExternalReference")
-                        .HasDatabaseName("ix_product_variants_external_reference");
-
-                    b.HasIndex("InternalCode")
+                    b.HasIndex("NormalizedSku")
                         .IsUnique()
-                        .HasDatabaseName("ux_product_variants_internal_code");
+                        .HasDatabaseName("ux_product_variants_normalized_sku");
 
                     b.HasIndex("ProductId");
 
