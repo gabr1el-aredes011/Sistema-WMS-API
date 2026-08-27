@@ -28,6 +28,7 @@ public static class SystemPermissions
         public const string Create = "products.create";
         public const string Update = "products.update";
         public const string Disable = "products.disable";
+        public const string Delete = "products.delete";
     }
 
     public static class Warehouses
@@ -95,6 +96,7 @@ public static class SystemPermissions
         new(Purchasing.Read, "Visualizar compras", "Purchasing", "Permite consultar processos de compra."),
         new(Purchasing.Manage, "Gerenciar compras", "Purchasing", "Permite administrar processos de compra."),
         new(Reports.Read, "Visualizar relatórios", "Analytics", "Permite acessar relatórios e indicadores."),
-        new(Audit.Read, "Visualizar auditoria", "Audit", "Permite consultar registros de auditoria.")
+        new(Audit.Read, "Visualizar auditoria", "Audit", "Permite consultar registros de auditoria."),
+        new(Products.Delete, "Excluir produtos", "Catalog", "Permite arquivar produtos de forma auditável.")
     ];
 }

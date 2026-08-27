@@ -9,6 +9,9 @@ public interface IProductCatalogService
         CreateCategoryCommand command,
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyCollection<ProductColorSummary>> GetColorsAsync(
+        CancellationToken cancellationToken = default);
+
     Task<PagedProducts> GetProductsAsync(
         string? search,
         Guid? categoryId,
@@ -33,5 +36,9 @@ public interface IProductCatalogService
     Task<CatalogResult<ProductDetails>> SetProductStatusAsync(
         Guid productId,
         bool isActive,
+        CancellationToken cancellationToken = default);
+
+    Task<CatalogResult<bool>> DeleteProductAsync(
+        Guid productId,
         CancellationToken cancellationToken = default);
 }

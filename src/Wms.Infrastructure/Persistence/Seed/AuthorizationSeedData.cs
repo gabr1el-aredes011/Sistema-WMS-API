@@ -34,7 +34,8 @@ internal static class AuthorizationSeedData
         Guid.Parse("10000000-0000-0000-0000-000000000023"),
         Guid.Parse("10000000-0000-0000-0000-000000000024"),
         Guid.Parse("10000000-0000-0000-0000-000000000025"),
-        Guid.Parse("10000000-0000-0000-0000-000000000026")
+        Guid.Parse("10000000-0000-0000-0000-000000000026"),
+        Guid.Parse("10000000-0000-0000-0000-000000000027")
     ];
 
     private static readonly Guid[] RoleIds =

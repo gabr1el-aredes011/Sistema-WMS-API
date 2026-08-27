@@ -30,6 +30,8 @@ public sealed class Product
 
     public DateTimeOffset? UpdatedAtUtc { get; set; }
 
+    public DateTimeOffset? DeletedAtUtc { get; set; }
+
     public ICollection<ProductVariant> Variants { get; set; }
         = new List<ProductVariant>();
 }

@@ -29,6 +29,8 @@ public sealed class ProductVariantConfiguration
         builder.Property(variant => variant.IsActive).IsRequired();
         builder.Property(variant => variant.CreatedAtUtc).IsRequired();
 
+        builder.HasQueryFilter(variant => variant.Product.DeletedAtUtc == null);
+
         builder.HasIndex(variant => variant.InternalCode)
             .IsUnique()
             .HasDatabaseName("ux_product_variants_internal_code");

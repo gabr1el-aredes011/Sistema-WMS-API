@@ -64,6 +64,7 @@ public sealed class PermissionPolicyTests
     [InlineData(nameof(ProductsController.Create), SystemPermissions.Products.Create)]
     [InlineData(nameof(ProductsController.Update), SystemPermissions.Products.Update)]
     [InlineData(nameof(ProductsController.SetStatus), SystemPermissions.Products.Disable)]
+    [InlineData(nameof(ProductsController.Delete), SystemPermissions.Products.Delete)]
     public void ProductEndpoint_RequiresExpectedPermission(
         string methodName,
         string expectedPolicy)

@@ -6,6 +6,11 @@ public sealed record ProductCategorySummary(
     bool IsActive,
     int ProductCount);
 
+public sealed record ProductColorSummary(
+    Guid Id,
+    string Name,
+    string HexCode);
+
 public sealed record ProductVariantDetails(
     Guid Id,
     string InternalCode,

@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Wms.Domain.Catalog;
 using Wms.Infrastructure.Persistence;
 
@@ -56,5 +58,32 @@ public sealed class CatalogModelTests
                 .SequenceEqual([nameof(Product.CategoryId), nameof(Product.NormalizedName)]));
 
         Assert.True(nameIndex.IsUnique);
+    }
+
+    [Fact]
+    public void ProductLifecycle_HasSoftDeleteFilters()
+    {
+        using var context = CreateContext();
+
+        Assert.NotEmpty(context.Model.FindEntityType(typeof(Product))!.GetDeclaredQueryFilters());
+        Assert.NotEmpty(context.Model.FindEntityType(typeof(ProductVariant))!.GetDeclaredQueryFilters());
+    }
+
+    [Fact]
+    public void ProductColor_HasCorporateCatalogSeed()
+    {
+        using var context = CreateContext();
+
+        var designTimeModel = context.GetService<IDesignTimeModel>().Model;
+        var entityType = designTimeModel.FindEntityType(typeof(ProductColor))!;
+        var colors = entityType.GetSeedData()
+            .Select(item => item[nameof(ProductColor.Name)])
+            .ToArray();
+
+        Assert.Equal(4, colors.Length);
+        Assert.Contains("Cinza", colors);
+        Assert.Contains("Laranja", colors);
+        Assert.Contains("Preto", colors);
+        Assert.Contains("Azul", colors);
     }
 }

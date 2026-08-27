@@ -27,6 +27,8 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(product => product.IsActive).IsRequired();
         builder.Property(product => product.CreatedAtUtc).IsRequired();
 
+        builder.HasQueryFilter(product => product.DeletedAtUtc == null);
+
         builder.HasIndex(product => new
         {
             product.CategoryId,
