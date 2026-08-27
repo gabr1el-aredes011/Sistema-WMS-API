@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Wms.Infrastructure.Authorization;
 using Wms.Infrastructure.Authentication;
 using Wms.Infrastructure.Identity;
+using Wms.Domain.Catalog;
 
 namespace Wms.Infrastructure.Persistence;
 
@@ -22,10 +23,21 @@ public sealed class WmsDbContext
 
     public DbSet<RefreshSession> RefreshSessions => Set<RefreshSession>();
 
+    public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
+
+    public DbSet<Product> Products => Set<Product>();
+
+    public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
+
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder
+            .HasSequence<long>("product_internal_code_sequence", "catalog")
+            .StartsAt(1)
+            .IncrementsBy(1);
 
         ConfigureIdentityTables(modelBuilder);
 

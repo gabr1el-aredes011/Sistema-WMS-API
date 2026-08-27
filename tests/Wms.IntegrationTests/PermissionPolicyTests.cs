@@ -57,4 +57,23 @@ public sealed class PermissionPolicyTests
         Assert.Contains(SystemPermissions.Users.Create, policies);
         Assert.Contains(SystemPermissions.Users.ManageRoles, policies);
     }
+
+    [Theory]
+    [InlineData(nameof(ProductsController.GetAll), SystemPermissions.Products.Read)]
+    [InlineData(nameof(ProductsController.GetById), SystemPermissions.Products.Read)]
+    [InlineData(nameof(ProductsController.Create), SystemPermissions.Products.Create)]
+    [InlineData(nameof(ProductsController.Update), SystemPermissions.Products.Update)]
+    [InlineData(nameof(ProductsController.SetStatus), SystemPermissions.Products.Disable)]
+    public void ProductEndpoint_RequiresExpectedPermission(
+        string methodName,
+        string expectedPolicy)
+    {
+        var method = typeof(ProductsController).GetMethod(methodName);
+        var policies = method!
+            .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true)
+            .Cast<AuthorizeAttribute>()
+            .Select(attribute => attribute.Policy);
+
+        Assert.Contains(expectedPolicy, policies);
+    }
 }

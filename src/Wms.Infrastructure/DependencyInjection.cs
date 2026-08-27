@@ -8,8 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Wms.Application.Authentication;
 using Wms.Application.Authorization;
+using Wms.Application.Catalog;
 using Wms.Application.Users;
 using Wms.Infrastructure.Authentication;
+using Wms.Infrastructure.Catalog;
 using Wms.Infrastructure.Identity;
 using Wms.Infrastructure.Persistence;
 
@@ -113,6 +115,7 @@ public static class DependencyInjection
         services.AddScoped<ITokenGenerator, TokenGenerator>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IUserAdministrationService, UserAdministrationService>();
+        services.AddScoped<IProductCatalogService, ProductCatalogService>();
 
         services
             .AddHealthChecks()
