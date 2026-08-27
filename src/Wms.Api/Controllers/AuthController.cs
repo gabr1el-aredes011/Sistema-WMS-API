@@ -14,6 +14,7 @@ public sealed class AuthController(
     [HttpPost("login")]
     [ProducesResponseType<AuthenticationSession>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Login(
         LoginRequest request,
@@ -37,6 +38,14 @@ public sealed class AuthController(
                 statusCode: StatusCodes.Status429TooManyRequests,
                 title: "Conta temporariamente bloqueada",
                 detail: "Aguarde alguns minutos antes de tentar novamente.");
+        }
+
+        if (result.FailureReason == AuthenticationFailureReason.InactiveUser)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                title: "Perfil inativo",
+                detail: "Seu perfil está inativo. Entre em contato com o seu administrador.");
         }
 
         return Problem(
