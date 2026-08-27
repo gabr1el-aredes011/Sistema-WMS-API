@@ -78,6 +78,20 @@ internal sealed class ProductCatalogService(
             .ToArrayAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyCollection<UnitOfMeasureSummary>> GetUnitsOfMeasureAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await dbContext.UnitsOfMeasure
+            .AsNoTracking()
+            .Where(unit => unit.IsActive)
+            .OrderBy(unit => unit.Code)
+            .Select(unit => new UnitOfMeasureSummary(
+                unit.Id,
+                unit.Code,
+                unit.Name))
+            .ToArrayAsync(cancellationToken);
+    }
+
     public async Task<PagedProducts> GetProductsAsync(
         string? search,
         Guid? categoryId,
@@ -195,6 +209,22 @@ internal sealed class ProductCatalogService(
             return CatalogResult<ProductDetails>.Fail(
                 CatalogFailure.Validation,
                 "Selecione somente cores ativas no catálogo da empresa.");
+        }
+
+        var activeUnitCodes = await dbContext.UnitsOfMeasure
+            .AsNoTracking()
+            .Where(unit => unit.IsActive)
+            .Select(unit => unit.Code)
+            .ToArrayAsync(cancellationToken);
+
+        if (command.Variants.Any(variant =>
+            !activeUnitCodes.Contains(
+                variant.UnitOfMeasure.Trim().ToUpperInvariant(),
+                StringComparer.Ordinal)))
+        {
+            return CatalogResult<ProductDetails>.Fail(
+                CatalogFailure.Validation,
+                "Selecione somente unidades de medida ativas no catálogo.");
         }
 
         var normalizedColors = command.Variants

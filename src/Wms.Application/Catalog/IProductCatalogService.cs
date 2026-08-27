@@ -12,6 +12,9 @@ public interface IProductCatalogService
     Task<IReadOnlyCollection<ProductColorSummary>> GetColorsAsync(
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyCollection<UnitOfMeasureSummary>> GetUnitsOfMeasureAsync(
+        CancellationToken cancellationToken = default);
+
     Task<PagedProducts> GetProductsAsync(
         string? search,
         Guid? categoryId,

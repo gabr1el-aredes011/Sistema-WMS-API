@@ -25,6 +25,7 @@ public sealed class CatalogModelTests
         Assert.Equal("catalog", context.Model.FindEntityType(typeof(ProductCategory))!.GetSchema());
         Assert.Equal("catalog", context.Model.FindEntityType(typeof(Product))!.GetSchema());
         Assert.Equal("catalog", context.Model.FindEntityType(typeof(ProductVariant))!.GetSchema());
+        Assert.Equal("catalog", context.Model.FindEntityType(typeof(UnitOfMeasure))!.GetSchema());
     }
 
     [Fact]
@@ -85,5 +86,24 @@ public sealed class CatalogModelTests
         Assert.Contains("Laranja", colors);
         Assert.Contains("Preto", colors);
         Assert.Contains("Azul", colors);
+    }
+
+    [Fact]
+    public void UnitOfMeasure_HasInitialOperationalCatalogSeed()
+    {
+        using var context = CreateContext();
+
+        var designTimeModel = context.GetService<IDesignTimeModel>().Model;
+        var entityType = designTimeModel.FindEntityType(typeof(UnitOfMeasure))!;
+        var units = entityType.GetSeedData()
+            .Select(item => item[nameof(UnitOfMeasure.Code)])
+            .ToArray();
+
+        Assert.Equal(5, units.Length);
+        Assert.Contains("UN", units);
+        Assert.Contains("PAR", units);
+        Assert.Contains("KIT", units);
+        Assert.Contains("KG", units);
+        Assert.Contains("M", units);
     }
 }
