@@ -64,6 +64,20 @@ internal sealed class ProductCatalogService(
                 ProductCount: 0));
     }
 
+    public async Task<IReadOnlyCollection<ProductColorSummary>> GetColorsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return await dbContext.ProductColors
+            .AsNoTracking()
+            .Where(color => color.IsActive)
+            .OrderBy(color => color.Name)
+            .Select(color => new ProductColorSummary(
+                color.Id,
+                color.Name,
+                color.HexCode))
+            .ToArrayAsync(cancellationToken);
+    }
+
     public async Task<PagedProducts> GetProductsAsync(
         string? search,
         Guid? categoryId,
@@ -157,7 +171,7 @@ internal sealed class ProductCatalogService(
 
         var normalizedName = Normalize(command.Name);
 
-        if (await dbContext.Products.AnyAsync(
+        if (await dbContext.Products.IgnoreQueryFilters().AnyAsync(
             product => product.CategoryId == command.CategoryId &&
                 product.NormalizedName == normalizedName,
             cancellationToken))
@@ -165,6 +179,34 @@ internal sealed class ProductCatalogService(
             return CatalogResult<ProductDetails>.Fail(
                 CatalogFailure.Conflict,
                 "Já existe um produto com este nome na categoria selecionada.");
+        }
+
+        var colorsByNormalizedName = await dbContext.ProductColors
+            .AsNoTracking()
+            .Where(color => color.IsActive)
+            .ToDictionaryAsync(
+                color => color.NormalizedName,
+                color => color.Name,
+                cancellationToken);
+
+        if (command.Variants.Any(variant =>
+            !colorsByNormalizedName.ContainsKey(Normalize(variant.Color))))
+        {
+            return CatalogResult<ProductDetails>.Fail(
+                CatalogFailure.Validation,
+                "Selecione somente cores ativas no catálogo da empresa.");
+        }
+
+        var normalizedColors = command.Variants
+            .Select(variant => Normalize(variant.Color))
+            .ToArray();
+
+        if (normalizedColors.Distinct(StringComparer.Ordinal).Count() !=
+            normalizedColors.Length)
+        {
+            return CatalogResult<ProductDetails>.Fail(
+                CatalogFailure.Validation,
+                "Não repita a mesma cor nas variantes do produto.");
         }
 
         var barcodes = command.Variants
@@ -180,7 +222,7 @@ internal sealed class ProductCatalogService(
                 "Os códigos de barras das variantes precisam ser únicos.");
         }
 
-        if (barcodes.Length > 0 && await dbContext.ProductVariants.AnyAsync(
+        if (barcodes.Length > 0 && await dbContext.ProductVariants.IgnoreQueryFilters().AnyAsync(
             variant => variant.ExternalBarcode != null &&
                 barcodes.Contains(variant.ExternalBarcode),
             cancellationToken))
@@ -206,7 +248,7 @@ internal sealed class ProductCatalogService(
             CreatedAtUtc = now,
             Variants = command.Variants.Select(variant => new ProductVariant
             {
-                Color = variant.Color.Trim(),
+                Color = colorsByNormalizedName[Normalize(variant.Color)],
                 ExternalReference = NormalizeOptional(variant.ExternalReference),
                 ExternalBarcode = NormalizeOptional(variant.ExternalBarcode),
                 UnitOfMeasure = variant.UnitOfMeasure.Trim().ToUpperInvariant(),
@@ -324,6 +366,42 @@ internal sealed class ProductCatalogService(
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return CatalogResult<ProductDetails>.Success(MapDetails(product));
+    }
+
+    public async Task<CatalogResult<bool>> DeleteProductAsync(
+        Guid productId,
+        CancellationToken cancellationToken = default)
+    {
+        var product = await dbContext.Products
+            .Include(item => item.Variants)
+            .SingleOrDefaultAsync(item => item.Id == productId, cancellationToken);
+
+        if (product is null)
+        {
+            return CatalogResult<bool>.Fail(
+                CatalogFailure.NotFound,
+                "Produto não encontrado.");
+        }
+
+        if (product.IsActive)
+        {
+            return CatalogResult<bool>.Fail(
+                CatalogFailure.Conflict,
+                "Inative o produto antes de excluí-lo.");
+        }
+
+        var now = timeProvider.GetUtcNow();
+        product.DeletedAtUtc = now;
+        product.UpdatedAtUtc = now;
+
+        foreach (var variant in product.Variants)
+        {
+            variant.IsActive = false;
+            variant.UpdatedAtUtc = now;
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        return CatalogResult<bool>.Success(true);
     }
 
     private static string[] ValidateProduct(CreateProductCommand command)

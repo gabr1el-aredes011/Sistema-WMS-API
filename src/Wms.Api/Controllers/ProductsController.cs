@@ -117,6 +117,22 @@ public sealed class ProductsController(
         return result.Succeeded ? Ok(result.Value) : ToProblem(result);
     }
 
+    [HttpDelete("{productId:guid}")]
+    [Authorize(Policy = SystemPermissions.Products.Delete)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Delete(
+        Guid productId,
+        CancellationToken cancellationToken)
+    {
+        var result = await productCatalogService.DeleteProductAsync(
+            productId,
+            cancellationToken);
+
+        return result.Succeeded ? NoContent() : ToProblem(result);
+    }
+
     private static CreateProductVariantCommand MapVariant(CreateProductVariantRequest request) =>
         new(
             request.Color,

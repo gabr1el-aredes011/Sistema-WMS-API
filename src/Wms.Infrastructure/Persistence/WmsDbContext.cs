@@ -29,6 +29,8 @@ public sealed class WmsDbContext
 
     public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
 
+    public DbSet<ProductColor> ProductColors => Set<ProductColor>();
+
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)
     {
