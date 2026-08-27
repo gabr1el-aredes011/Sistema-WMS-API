@@ -5,6 +5,7 @@ using Wms.Infrastructure.Authorization;
 using Wms.Infrastructure.Authentication;
 using Wms.Infrastructure.Identity;
 using Wms.Domain.Catalog;
+using Wms.Domain.Suppliers;
 
 namespace Wms.Infrastructure.Persistence;
 
@@ -30,6 +31,10 @@ public sealed class WmsDbContext
     public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
 
     public DbSet<ProductColor> ProductColors => Set<ProductColor>();
+
+    public DbSet<UnitOfMeasure> UnitsOfMeasure => Set<UnitOfMeasure>();
+
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
 
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)

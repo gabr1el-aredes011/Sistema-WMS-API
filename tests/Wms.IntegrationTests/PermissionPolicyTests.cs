@@ -77,4 +77,36 @@ public sealed class PermissionPolicyTests
 
         Assert.Contains(expectedPolicy, policies);
     }
+
+    [Theory]
+    [InlineData(nameof(SuppliersController.GetAll), SystemPermissions.Suppliers.Read)]
+    [InlineData(nameof(SuppliersController.GetById), SystemPermissions.Suppliers.Read)]
+    [InlineData(nameof(SuppliersController.Create), SystemPermissions.Suppliers.Manage)]
+    [InlineData(nameof(SuppliersController.Update), SystemPermissions.Suppliers.Manage)]
+    [InlineData(nameof(SuppliersController.SetStatus), SystemPermissions.Suppliers.Manage)]
+    public void SupplierEndpoint_RequiresExpectedPermission(
+        string methodName,
+        string expectedPolicy)
+    {
+        var method = typeof(SuppliersController).GetMethod(methodName);
+        var policies = method!
+            .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true)
+            .Cast<AuthorizeAttribute>()
+            .Select(attribute => attribute.Policy);
+
+        Assert.Contains(expectedPolicy, policies);
+    }
+
+    [Fact]
+    public void UnitsOfMeasureEndpoint_RequiresProductReadPermission()
+    {
+        var method = typeof(UnitsOfMeasureController).GetMethod(
+            nameof(UnitsOfMeasureController.GetAll));
+        var policies = method!
+            .GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true)
+            .Cast<AuthorizeAttribute>()
+            .Select(attribute => attribute.Policy);
+
+        Assert.Contains(SystemPermissions.Products.Read, policies);
+    }
 }

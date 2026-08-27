@@ -10,10 +10,12 @@ using Wms.Application.Authentication;
 using Wms.Application.Authorization;
 using Wms.Application.Catalog;
 using Wms.Application.Users;
+using Wms.Application.Suppliers;
 using Wms.Infrastructure.Authentication;
 using Wms.Infrastructure.Catalog;
 using Wms.Infrastructure.Identity;
 using Wms.Infrastructure.Persistence;
+using Wms.Infrastructure.Suppliers;
 
 namespace Wms.Infrastructure;
 
@@ -116,6 +118,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IUserAdministrationService, UserAdministrationService>();
         services.AddScoped<IProductCatalogService, ProductCatalogService>();
+        services.AddScoped<ISupplierService, SupplierService>();
 
         services
             .AddHealthChecks()

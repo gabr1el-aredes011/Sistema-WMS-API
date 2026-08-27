@@ -11,6 +11,11 @@ public sealed record ProductColorSummary(
     string Name,
     string HexCode);
 
+public sealed record UnitOfMeasureSummary(
+    Guid Id,
+    string Code,
+    string Name);
+
 public sealed record ProductVariantDetails(
     Guid Id,
     string InternalCode,
