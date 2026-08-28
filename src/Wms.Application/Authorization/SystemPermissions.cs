@@ -59,6 +59,19 @@ public static class SystemPermissions
         public const string Manage = "purchasing.manage";
     }
 
+    public static class Carriers
+    {
+        public const string Read = "carriers.read";
+        public const string Manage = "carriers.manage";
+    }
+
+    public static class Dispatch
+    {
+        public const string Read = "dispatch.read";
+        public const string Manage = "dispatch.manage";
+        public const string UpdateReadiness = "dispatch.readiness.update";
+    }
+
     public static class Reports
     {
         public const string Read = "reports.read";
@@ -97,6 +110,11 @@ public static class SystemPermissions
         new(Purchasing.Manage, "Gerenciar compras", "Purchasing", "Permite administrar processos de compra."),
         new(Reports.Read, "Visualizar relatórios", "Analytics", "Permite acessar relatórios e indicadores."),
         new(Audit.Read, "Visualizar auditoria", "Audit", "Permite consultar registros de auditoria."),
-        new(Products.Delete, "Excluir produtos", "Catalog", "Permite arquivar produtos de forma auditável.")
+        new(Products.Delete, "Excluir produtos", "Catalog", "Permite arquivar produtos de forma auditável."),
+        new(Carriers.Read, "Visualizar transportadoras", "Shipping", "Permite consultar transportadoras."),
+        new(Carriers.Manage, "Gerenciar transportadoras", "Shipping", "Permite cadastrar e alterar transportadoras."),
+        new(Dispatch.Read, "Visualizar expedições", "Shipping", "Permite consultar coletas e expedições."),
+        new(Dispatch.Manage, "Gerenciar expedições", "Shipping", "Permite criar e administrar solicitações de coleta."),
+        new(Dispatch.UpdateReadiness, "Atualizar prontidão", "Shipping", "Permite informar preparação, prontidão e coleta.")
     ];
 }

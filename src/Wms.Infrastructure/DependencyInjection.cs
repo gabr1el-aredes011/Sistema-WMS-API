@@ -16,6 +16,8 @@ using Wms.Infrastructure.Catalog;
 using Wms.Infrastructure.Identity;
 using Wms.Infrastructure.Persistence;
 using Wms.Infrastructure.Suppliers;
+using Wms.Application.Shipping;
+using Wms.Infrastructure.Shipping;
 
 namespace Wms.Infrastructure;
 
@@ -119,6 +121,7 @@ public static class DependencyInjection
         services.AddScoped<IUserAdministrationService, UserAdministrationService>();
         services.AddScoped<IProductCatalogService, ProductCatalogService>();
         services.AddScoped<ISupplierService, SupplierService>();
+        services.AddScoped<IShippingService, ShippingService>();
 
         services
             .AddHealthChecks()

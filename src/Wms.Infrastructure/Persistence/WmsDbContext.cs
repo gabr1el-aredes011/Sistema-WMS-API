@@ -6,6 +6,7 @@ using Wms.Infrastructure.Authentication;
 using Wms.Infrastructure.Identity;
 using Wms.Domain.Catalog;
 using Wms.Domain.Suppliers;
+using Wms.Domain.Shipping;
 
 namespace Wms.Infrastructure.Persistence;
 
@@ -35,6 +36,8 @@ public sealed class WmsDbContext
     public DbSet<UnitOfMeasure> UnitsOfMeasure => Set<UnitOfMeasure>();
 
     public DbSet<Supplier> Suppliers => Set<Supplier>();
+    public DbSet<Carrier> Carriers => Set<Carrier>();
+    public DbSet<PickupRequest> PickupRequests => Set<PickupRequest>();
 
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)
@@ -43,6 +46,11 @@ public sealed class WmsDbContext
 
         modelBuilder
             .HasSequence<long>("product_internal_code_sequence", "catalog")
+            .StartsAt(1)
+            .IncrementsBy(1);
+
+        modelBuilder
+            .HasSequence<long>("pickup_code_sequence", "shipping")
             .StartsAt(1)
             .IncrementsBy(1);
 
