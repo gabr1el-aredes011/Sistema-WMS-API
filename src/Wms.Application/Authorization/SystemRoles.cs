@@ -33,6 +33,11 @@ public static class SystemRoles
                 SystemPermissions.Inventory.Adjust,
                 SystemPermissions.Inventory.Count,
                 SystemPermissions.Suppliers.Read,
+                SystemPermissions.Carriers.Read,
+                SystemPermissions.Carriers.Manage,
+                SystemPermissions.Dispatch.Read,
+                SystemPermissions.Dispatch.Manage,
+                SystemPermissions.Dispatch.UpdateReadiness,
                 SystemPermissions.Purchasing.Read,
                 SystemPermissions.Reports.Read,
                 SystemPermissions.Audit.Read
@@ -59,7 +64,9 @@ public static class SystemRoles
                 SystemPermissions.Inventory.Receive,
                 SystemPermissions.Inventory.Issue,
                 SystemPermissions.Inventory.Transfer,
-                SystemPermissions.Inventory.Count
+                SystemPermissions.Inventory.Count,
+                SystemPermissions.Dispatch.Read,
+                SystemPermissions.Dispatch.UpdateReadiness
             ]),
         new(
             Picker,
@@ -68,7 +75,9 @@ public static class SystemRoles
                 SystemPermissions.Products.Read,
                 SystemPermissions.Warehouses.Read,
                 SystemPermissions.Inventory.Read,
-                SystemPermissions.Inventory.Issue
+                SystemPermissions.Inventory.Issue,
+                SystemPermissions.Dispatch.Read,
+                SystemPermissions.Dispatch.UpdateReadiness
             ]),
         new(
             Auditor,
@@ -79,7 +88,8 @@ public static class SystemRoles
                 SystemPermissions.Inventory.Read,
                 SystemPermissions.Inventory.Count,
                 SystemPermissions.Reports.Read,
-                SystemPermissions.Audit.Read
+                SystemPermissions.Audit.Read,
+                SystemPermissions.Dispatch.Read
             ])
     ];
 }

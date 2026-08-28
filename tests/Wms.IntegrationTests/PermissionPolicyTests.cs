@@ -109,4 +109,19 @@ public sealed class PermissionPolicyTests
 
         Assert.Contains(SystemPermissions.Products.Read, policies);
     }
+
+    [Theory]
+    [InlineData(typeof(CarriersController), nameof(CarriersController.GetAll), SystemPermissions.Carriers.Read)]
+    [InlineData(typeof(CarriersController), nameof(CarriersController.Create), SystemPermissions.Carriers.Manage)]
+    [InlineData(typeof(DispatchController), nameof(DispatchController.GetAll), SystemPermissions.Dispatch.Read)]
+    [InlineData(typeof(DispatchController), nameof(DispatchController.Create), SystemPermissions.Dispatch.Manage)]
+    [InlineData(typeof(DispatchController), nameof(DispatchController.SetStatus), SystemPermissions.Dispatch.UpdateReadiness)]
+    public void ShippingEndpoint_RequiresExpectedPermission(Type controllerType, string methodName, string expectedPolicy)
+    {
+        var policies = controllerType.GetMethod(methodName)!
+            .GetCustomAttributes(typeof(AuthorizeAttribute), true)
+            .Cast<AuthorizeAttribute>()
+            .Select(attribute => attribute.Policy);
+        Assert.Contains(expectedPolicy, policies);
+    }
 }
