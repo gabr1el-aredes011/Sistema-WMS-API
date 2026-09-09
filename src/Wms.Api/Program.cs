@@ -53,6 +53,17 @@ app.UseCors(frontendCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Retired modules keep their historical tables but no longer expose endpoints.
+app.Use(async (context, next) =>
+{
+    var retired = new[] { "/api/v1/carriers", "/api/v1/carrier-portal", "/api/v1/suppliers", "/api/v1/dispatch/pickups" };
+    if (retired.Any(path => context.Request.Path.StartsWithSegments(path)))
+    {
+        context.Response.StatusCode = StatusCodes.Status410Gone;
+        return;
+    }
+    await next();
+});
 app.MapControllers();
 
 app.MapHealthChecks("/api/v1/health/ready");

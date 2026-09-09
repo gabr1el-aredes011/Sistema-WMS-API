@@ -106,6 +106,10 @@ public static class DependencyInjection
 
         services.AddAuthorization(options =>
         {
+            options.AddPolicy("operations.read", p => p.RequireAssertion(c => c.User.HasClaim("permission", "inventory.read") || c.User.HasClaim("permission", "dispatch.read")));
+            options.AddPolicy("operations.orders", p => p.RequireAssertion(c => c.User.HasClaim("permission", "purchasing.manage") || c.User.HasClaim("permission", "dispatch.manage")));
+            options.AddPolicy("operations.production", p => p.RequireClaim("permission", "inventory.receive"));
+            options.AddPolicy("operations.dispatch", p => p.RequireClaim("permission", "dispatch.readiness.update"));
             foreach (var permission in SystemPermissions.All)
             {
                 options.AddPolicy(
@@ -116,6 +120,7 @@ public static class DependencyInjection
             }
         });
         services.AddSingleton(TimeProvider.System);
+        services.AddScoped<Wms.Application.Operations.IOperationsService, Wms.Infrastructure.Operations.OperationsService>();
         services.AddScoped<ITokenGenerator, TokenGenerator>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IUserAdministrationService, UserAdministrationService>();
