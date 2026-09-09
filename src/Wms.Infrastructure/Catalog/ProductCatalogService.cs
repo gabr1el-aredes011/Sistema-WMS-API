@@ -381,6 +381,8 @@ internal sealed class ProductCatalogService(
         bool isActive,
         CancellationToken cancellationToken = default)
     {
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        await dbContext.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(88421001)", cancellationToken);
         var product = await dbContext.Products
             .Include(item => item.Category)
             .Include(item => item.Variants)
@@ -394,6 +396,7 @@ internal sealed class ProductCatalogService(
         product.IsActive = isActive;
         product.UpdatedAtUtc = timeProvider.GetUtcNow();
         await dbContext.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
 
         return CatalogResult<ProductDetails>.Success(MapDetails(product));
     }
@@ -402,6 +405,8 @@ internal sealed class ProductCatalogService(
         Guid productId,
         CancellationToken cancellationToken = default)
     {
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+        await dbContext.Database.ExecuteSqlRawAsync("SELECT pg_advisory_xact_lock(88421001)", cancellationToken);
         var product = await dbContext.Products
             .Include(item => item.Variants)
             .SingleOrDefaultAsync(item => item.Id == productId, cancellationToken);
@@ -420,6 +425,11 @@ internal sealed class ProductCatalogService(
                 "Inative o produto antes de excluí-lo.");
         }
 
+        var variantIds = product.Variants.Select(x => x.Id).ToArray();
+        if (await dbContext.Set<Wms.Domain.Operations.StockBalance>().AnyAsync(x => variantIds.Contains(x.VariantId) && x.OnHand > 0, cancellationToken) ||
+            await dbContext.Set<Wms.Domain.Operations.SalesOrder>().Where(x => x.Status != "Cancelled" && x.Status != "Dispatched")
+                .SelectMany(x => x.Lines).AnyAsync(x => x.VariantId != null && variantIds.Contains(x.VariantId.Value), cancellationToken))
+            return CatalogResult<bool>.Fail(CatalogFailure.Conflict, "Produto com saldo ou pedido aberto não pode ser excluído.");
         var now = timeProvider.GetUtcNow();
         product.DeletedAtUtc = now;
         product.UpdatedAtUtc = now;
@@ -431,6 +441,7 @@ internal sealed class ProductCatalogService(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
         return CatalogResult<bool>.Success(true);
     }
 
